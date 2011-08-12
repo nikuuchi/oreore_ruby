@@ -2924,6 +2924,8 @@ primary		: literal
 			$$ = dispatch3(for, $2, $5, $8);
 		    %*/
 		    }
+                | k_for for_var keyword_in compstmt ',' for_var keyword_in compstmt 
+		  k_end
 		| k_class cpath superclass
 		    {
 			if (in_def || in_single)
