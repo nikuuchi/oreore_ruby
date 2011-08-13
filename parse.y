@@ -649,6 +649,7 @@ static void token_info_pop(struct parser_params*, const char *token);
 	keyword_redo
 	keyword_retry
 	keyword_in
+        keyword_with
 	keyword_do
 	keyword_do_cond
 	keyword_do_block
@@ -1890,7 +1891,7 @@ reswords	: keyword__LINE__ | keyword__FILE__ | keyword__ENCODING__
 		| keyword_break | keyword_case | keyword_class | keyword_def
 		| keyword_defined | keyword_do | keyword_else | keyword_elsif
 		| keyword_end | keyword_ensure | keyword_false
-		| keyword_for | keyword_in | keyword_module | keyword_next
+		| keyword_for | keyword_in | keyword_with  | keyword_module | keyword_next
 		| keyword_nil | keyword_not | keyword_or | keyword_redo
 		| keyword_rescue | keyword_retry | keyword_return | keyword_self
 		| keyword_super | keyword_then | keyword_true | keyword_undef
@@ -2924,14 +2925,14 @@ primary		: literal
 			$$ = dispatch3(for, $2, $5, $8);
 		    %*/
 		    }
-                | k_for for_var keyword_in 
-		  {COND_PUSH(2);}
-                  expr_value ',' for_var keyword_in 
-		  {COND_POP();}
+                | k_for for_var keyword_in expr_value
+		  keyword_with  for_var keyword_in 
+		{COND_PUSH(1);}
                   expr_value do
-		  {COND_POP();}
-		  compstmt 
+		 {COND_POP();}
+                  compstmt
 		  k_end
+		  { }
 		| k_class cpath superclass
 		    {
 			if (in_def || in_single)
@@ -3129,7 +3130,6 @@ k_for		: keyword_for
 			token_info_push("for");
 		    }
 		;
-
 k_class		: keyword_class
 		    {
 			token_info_push("class");
@@ -10613,6 +10613,7 @@ static const struct kw_assoc {
     {keyword_redo,	"redo"},
     {keyword_retry,	"retry"},
     {keyword_in,	"in"},
+    {keyword_with,      "with"},
     {keyword_do,	"do"},
     {keyword_do_cond,	"do"},
     {keyword_do_block,	"do"},
