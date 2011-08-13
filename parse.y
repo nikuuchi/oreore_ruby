@@ -2936,8 +2936,11 @@ primary		: literal
 		  k_end
 		  { 
 			ID id = internal_id();
+			ID id2 = internal_id();
 			ID *tbl = ALLOC_N(ID, 2);
+			ID *tbl2 = ALLOC_N(ID, 2);
 			NODE *m = NEW_ARGS_AUX(0, 0);
+			NODE *m2 = NEW_ARGS_AUX(0, 0);
 			NODE *args, *scope, *args2, *scope2;
 
 			if (nd_type($2) == NODE_MASGN) {
@@ -2975,41 +2978,42 @@ primary		: literal
 			if (nd_type($7) == NODE_MASGN) {
 			    NODE *one = NEW_LIST(NEW_LIT(INT2FIX(1)));
 			    NODE *zero = NEW_LIST(NEW_LIT(INT2FIX(0)));
-			    m->nd_next = block_append(
+			    m2->nd_next = block_append(
 				NEW_IF(
 				    NEW_NODE(NODE_AND,
-					     NEW_CALL(NEW_CALL(NEW_DVAR(id), rb_intern("length"), 0),
+					     NEW_CALL(NEW_CALL(NEW_DVAR(id2), rb_intern("length"), 0),
 						      rb_intern("=="), one),
-					     NEW_CALL(NEW_CALL(NEW_DVAR(id), rb_intern("[]"), zero),
+					     NEW_CALL(NEW_CALL(NEW_DVAR(id2), rb_intern("[]"), zero),
 						      rb_intern("kind_of?"), NEW_LIST(NEW_LIT(rb_cArray))),
 					     0),
-				    NEW_DASGN_CURR(id,
-						   NEW_CALL(NEW_DVAR(id), rb_intern("[]"), zero)),
+				    NEW_DASGN_CURR(id2,
+						   NEW_CALL(NEW_DVAR(id2), rb_intern("[]"), zero)),
 				    0),
-				node_assign($7, NEW_DVAR(id)));
+				node_assign($7, NEW_DVAR(id2)));
 
-			    args2 = new_args(m, 0, id, 0, 0);
+			    args2 = new_args(m2, 0, id2, 0, 0);
 			}
 			else {
 			    if (nd_type($7) == NODE_LASGN ||
 				nd_type($7) == NODE_DASGN ||
 				nd_type($7) == NODE_DASGN_CURR) {
-				$7->nd_value = NEW_DVAR(id);
-				m->nd_plen = 1;
-				m->nd_next = $7;
-				args2 = new_args(m, 0, 0, 0, 0);
+				$7->nd_value = NEW_DVAR(id2);
+				m2->nd_plen = 1;
+				m2->nd_next = $7;
+				args2 = new_args(m2, 0, 0, 0, 0);
 			    }
 			    else {
 				m->nd_next = node_assign(NEW_MASGN(NEW_LIST($7), 0), NEW_DVAR(id));
-				args2 = new_args(m, 0, id, 0, 0);
+				args2 = new_args(m2, 0, id2, 0, 0);
 			    }
 			}
 
 
-			scope2 = NEW_NODE(NODE_SCOPE, tbl, $12, args2);
-			scope = NEW_NODE(NODE_SCOPE, tbl, NEW_FOR(0,$5,scope2), args);
+			scope2 = NEW_NODE(NODE_SCOPE, tbl2, $12, args2);
+			scope = NEW_NODE(NODE_SCOPE, tbl, NEW_FOR(0,$9,scope2), args);
 			tbl[0] = 1; tbl[1] = id;
-			$$ = NEW_FOR(0, $9, scope);
+			tbl2[0] = 1; tbl2[1] = id2;
+			$$ = NEW_FOR(0, $5, scope);
 			fixpos($$, $2);
 
 		  }
