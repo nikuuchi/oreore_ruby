@@ -2933,7 +2933,54 @@ primary		: literal
 		{COND_POP();}
                   compstmt
 		  k_end
-		  { }
+		  { 
+			ID id = internal_id();
+			ID *tbl = ALLOC_N(ID, 2);
+			NODE *m = NEW_ARGS_AUX(0, 0);
+			NODE *args, *scope;
+
+			if (nd_type($2) == NODE_MASGN) {
+			    /* if args.length == 1 && args[0].kind_of?(Array)
+			     *   args = args[0]
+			     * end
+			     */
+			    NODE *one = NEW_LIST(NEW_LIT(INT2FIX(1)));
+			    NODE *zero = NEW_LIST(NEW_LIT(INT2FIX(0)));
+			    m->nd_next = block_append(
+				NEW_IF(
+				    NEW_NODE(NODE_AND,
+					     NEW_CALL(NEW_CALL(NEW_DVAR(id), rb_intern("length"), 0),
+						      rb_intern("=="), one),
+					     NEW_CALL(NEW_CALL(NEW_DVAR(id), rb_intern("[]"), zero),
+						      rb_intern("kind_of?"), NEW_LIST(NEW_LIT(rb_cArray))),
+					     0),
+				    NEW_DASGN_CURR(id,
+						   NEW_CALL(NEW_DVAR(id), rb_intern("[]"), zero)),
+				    0),
+				node_assign($2, NEW_DVAR(id)));
+
+			    args = new_args(m, 0, id, 0, 0);
+			}
+			else {
+			    if (nd_type($2) == NODE_LASGN ||
+				nd_type($2) == NODE_DASGN ||
+				nd_type($2) == NODE_DASGN_CURR) {
+				$2->nd_value = NEW_DVAR(id);
+				m->nd_plen = 1;
+				m->nd_next = $2;
+				args = new_args(m, 0, 0, 0, 0);
+			    }
+			    else {
+				m->nd_next = node_assign(NEW_MASGN(NEW_LIST($2), 0), NEW_DVAR(id));
+				args = new_args(m, 0, id, 0, 0);
+			    }
+			}
+			scope = NEW_NODE(NODE_SCOPE, tbl, $8, args);
+			tbl[0] = 1; tbl[1] = id;
+			$$ = NEW_FOR(0, $5, scope);
+			fixpos($$, $2);
+
+		  }
 		| k_class cpath superclass
 		    {
 			if (in_def || in_single)

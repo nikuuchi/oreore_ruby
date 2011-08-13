@@ -175,6 +175,11 @@ dump_node(VALUE buf, VALUE indent, int comment, NODE *node)
 	F_NODE(nd_body, "body");
 	break;
 
+      case NODE_FOR2:
+	ANN("method call with block");
+	ANN("format: for * in [nd_iter] with * in [nd_iter] do [nd_body] end");
+	ANN("example: for x in 1..3 with y in 2..4 do foo end");
+	goto iter;
       case NODE_BREAK:
 	ANN("for statement");
 	ANN("format: break [nd_stts]");
