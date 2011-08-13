@@ -2924,7 +2924,16 @@ primary		: literal
 			$$ = dispatch3(for, $2, $5, $8);
 		    %*/
 		    }
-                | k_for for_var keyword_in compstmt ',' for_var keyword_in compstmt 
+                | k_for for_var keyword_in 
+		  {COND_PUSH(1);}
+                  expr_value do 
+		  {COND_POP();}
+                  compstmt ','
+		  for_var keyword_in 
+		  {COND_PUSH(1);}
+                  expr_value do
+		  {COND_POP();}
+		  compstmt 
 		  k_end
 		| k_class cpath superclass
 		    {
