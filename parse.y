@@ -644,6 +644,7 @@ static void token_info_pop(struct parser_params*, const char *token);
 	keyword_while
 	keyword_until
 	keyword_for
+        keyword_for2
 	keyword_break
 	keyword_next
 	keyword_redo
@@ -1891,7 +1892,7 @@ reswords	: keyword__LINE__ | keyword__FILE__ | keyword__ENCODING__
 		| keyword_break | keyword_case | keyword_class | keyword_def
 		| keyword_defined | keyword_do | keyword_else | keyword_elsif
 		| keyword_end | keyword_ensure | keyword_false
-		| keyword_for | keyword_in | keyword_with  | keyword_module | keyword_next
+		| keyword_for | keyword_for2 | keyword_in | keyword_with  | keyword_module | keyword_next
 		| keyword_nil | keyword_not | keyword_or | keyword_redo
 		| keyword_rescue | keyword_retry | keyword_return | keyword_self
 		| keyword_super | keyword_then | keyword_true | keyword_undef
@@ -2925,11 +2926,11 @@ primary		: literal
 			$$ = dispatch3(for, $2, $5, $8);
 		    %*/
 		    }
-                | k_for for_var keyword_in expr_value
-		  keyword_with  for_var keyword_in 
+                | k_for2 for_var keyword_in 
 		{COND_PUSH(1);}
-                  expr_value do
-		 {COND_POP();}
+                 expr_value 
+                 keyword_with  for_var keyword_in expr_value do
+		{COND_POP();}
                   compstmt
 		  k_end
 		  { }
@@ -3130,6 +3131,10 @@ k_for		: keyword_for
 			token_info_push("for");
 		    }
 		;
+k_for2          : keyword_for2
+                    {
+		      token_info_push("for2");
+		    }
 k_class		: keyword_class
 		    {
 			token_info_push("class");
@@ -10608,6 +10613,7 @@ static const struct kw_assoc {
     {keyword_while,	"while"},
     {keyword_until,	"until"},
     {keyword_for,	"for"},
+    {keyword_for2,      "for2"},
     {keyword_break,	"break"},
     {keyword_next,	"next"},
     {keyword_redo,	"redo"},
