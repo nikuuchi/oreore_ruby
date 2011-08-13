@@ -2925,12 +2925,9 @@ primary		: literal
 		    %*/
 		    }
                 | k_for for_var keyword_in 
-		  {COND_PUSH(1);}
-                  expr_value do 
+		  {COND_PUSH(2);}
+                  expr_value ',' for_var keyword_in 
 		  {COND_POP();}
-                  compstmt ','
-		  for_var keyword_in 
-		  {COND_PUSH(1);}
                   expr_value do
 		  {COND_POP();}
 		  compstmt 
