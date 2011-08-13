@@ -30,6 +30,7 @@ false, {keyword_false, keyword_false}, EXPR_END
 for, {keyword_for, keyword_for}, EXPR_VALUE
 if, {keyword_if, modifier_if}, EXPR_VALUE
 in, {keyword_in, keyword_in}, EXPR_VALUE
+with,{keyword_with, keyword_with}, EXPR_VALUE
 module, {keyword_module, keyword_module}, EXPR_VALUE
 next, {keyword_next, keyword_next}, EXPR_MID
 nil, {keyword_nil, keyword_nil}, EXPR_END
