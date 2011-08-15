@@ -2935,6 +2935,16 @@ primary		: literal
                   compstmt
 		  k_end
 		  { 
+			    /*%%%*/
+			/*
+			 *  for a, b, c in e with f, g, h in f
+			 *  #=>
+			 *  e.each{|*x| a, b, c = x; f.each{|*y| f, g, h = y
+			 *
+			 *  for a in e with b in f
+			 *  #=>
+			 *  e.each{|x| a, = x; f.each{|x| b, = y}
+			 */
 			ID id = internal_id();
 			ID id2 = internal_id();
 			ID *tbl = ALLOC_N(ID, 2);
@@ -3015,7 +3025,9 @@ primary		: literal
 			tbl2[0] = 1; tbl2[1] = id2;
 			$$ = NEW_FOR(0, $5, scope);
 			fixpos($$, $2);
-
+		   /*%
+			$$ = dispatch3(for, $2, $5, dispatch3(for, $7, $9, $12));
+		    %*/
 		  }
 		| k_class cpath superclass
 		    {
